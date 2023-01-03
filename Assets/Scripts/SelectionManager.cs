@@ -77,8 +77,9 @@ public class SelectionManager : MonoBehaviour
                 {
                 hittedfirst = selection.gameObject;
                     firstObjectwithTag = false;
-                    allChildRenderers = hittedfirst.GetComponentsInChildren<Renderer>();
-                    if (allChildRenderers == null)
+
+                    allChildRenderers = hittedfirst.GetComponentsInChildren<Renderer>();// j'ai rajouté ceci dans le cadre du replade prefab car ils sont composés de plusieurs objets
+                    if (allChildRenderers == null)//si pas d'enfants alors on peu jouer direct
                     { 
 
                         selectionRenderer = hittedfirst.GetComponent<Renderer>();//ici je recupere la partie "render"
@@ -86,13 +87,14 @@ public class SelectionManager : MonoBehaviour
                         selectionRenderer.material.EnableKeyword("_EMISSION");// j'active l'emission et je change la couleur
                         selectionRenderer.material.SetColor("_EmissionColor", emissiveColor * emissiveIntensity);
                     }
-                    else
+                    else//si il y a des enfants ... jouons avec tous les enfants
                     { 
-                    for (int i = 0; i < allChildRenderers.Length; i++)
-                    {
-                        allChildRenderers[i].material.EnableKeyword("_EMISSION");// j'active l'emission et je change la couleur
-                        allChildRenderers[i].material.SetColor("_EmissionColor", emissiveColor * emissiveIntensity);
-                    }
+                        for (int i = 0; i < allChildRenderers.Length; i++)
+                        {
+                            allChildRenderers[i].material.EnableKeyword("_EMISSION");// j'active l'emission et je change la couleur de tous les enfants
+                                                                                     // a tester si certains enfants n'ont pas de "meshrender"
+                            allChildRenderers[i].material.SetColor("_EmissionColor", emissiveColor * emissiveIntensity);
+                        }
                     }
                 }
                 else if (firstObjectwithTag == false) //si ce n'est pas le premier objet interactif que je croise
@@ -164,12 +166,10 @@ public class SelectionManager : MonoBehaviour
             }
             if (hittedfirst.tag == SelectableMeshTag)//je compare le tag, si c'est un tag Mesh alors :
             {
-                versMesh = 1;
-
                 if (versMesh == 1)
                 {
                     GameObject newObject;
-                newObject = Instantiate(secondObj) as GameObject;
+                newObject = Instantiate(secondObj);
                 newObject.transform.position = hittedfirst.transform.position;
                 newObject.transform.rotation = hittedfirst.transform.rotation;
                 newObject.transform.parent = hittedfirst.transform.parent;
@@ -177,11 +177,12 @@ public class SelectionManager : MonoBehaviour
                     versMesh = 2;
                     DestroyImmediate(hittedfirst);
                     hittedfirst = newObject;
+                    Debug.Log(versMesh);
                 }
-                else if (versMesh == 2)
+                else
                 {
                     GameObject newObject;
-                    newObject = Instantiate(firstObj) as GameObject;
+                    newObject = Instantiate(firstObj);
                     newObject.transform.position = hittedfirst.transform.position;
                     newObject.transform.rotation = hittedfirst.transform.rotation;
                     newObject.transform.parent = hittedfirst.transform.parent;
@@ -189,6 +190,7 @@ public class SelectionManager : MonoBehaviour
                     versMesh = 1;
                     DestroyImmediate(hittedfirst);
                     hittedfirst = newObject;
+                    Debug.Log(versMesh);
                 }
 
 
